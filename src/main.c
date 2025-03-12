@@ -53,10 +53,13 @@ int	run_simulation(t_simulation *sim)
 	if (set_start_time(sim) != SUCCESS)
 		return (error_exit(ERR_TIME, sim));
 	
-	if (create_philosophers(sim) != SUCCESS)
+	if (create_philosopher_threads(sim) != SUCCESS)
 		return (error_exit(ERR_THREAD, sim));
 	
 	monitor_simulation(sim);
+	
+	if (join_philosopher_threads(sim) != SUCCESS)
+		return (error_exit(ERR_THREAD, sim));
 	
 	return (SUCCESS);
 }
@@ -73,7 +76,7 @@ int	main(int ac, char **av)
 	if (parse_arguments(&sim, ac, av) != SUCCESS)
 		return (error_exit(ERR_ARGS, NULL));
 	
-	if (init_simulation(&sim, ac, av) != SUCCESS)
+	if (init_simulation(&sim) != SUCCESS)
 		return (ERROR);
 	
 	if (run_simulation(&sim) != SUCCESS)

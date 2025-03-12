@@ -94,7 +94,8 @@ void		precise_sleep(long long ms, t_simulation *sim);
 int			set_start_time(t_simulation *sim);
 
 /* philosopher.c */
-int			create_philosophers(t_simulation *sim);
+int			create_philosopher_threads(t_simulation *sim);
+int			join_philosopher_threads(t_simulation *sim);
 void		*philosopher_routine(void *arg);
 
 /* actions.c */

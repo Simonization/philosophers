@@ -12,7 +12,7 @@
 
 #include "../includes/philo.h"
 
-int	create_philosophers(t_simulation *sim)
+int	create_philosopher_threads(t_simulation *sim)
 {
 	int	i;
 	int	ret;
@@ -27,6 +27,14 @@ int	create_philosophers(t_simulation *sim)
 			return (ERROR);
 		i++;
 	}
+	return (SUCCESS);
+}
+
+int	join_philosopher_threads(t_simulation *sim)
+{
+	int	i;
+	int	ret;
+
 	i = 0;
 	while (i < sim->nb_philos)
 	{
