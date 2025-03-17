@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "../includes/philo.h"
 
 int	validate_arguments(int ac, char **av)
@@ -39,12 +38,10 @@ int	parse_arguments(t_simulation *sim, int ac, char **av)
 	sim->time_to_die = ft_atoi(av[2]);
 	sim->time_to_eat = ft_atoi(av[3]);
 	sim->time_to_sleep = ft_atoi(av[4]);
-	
 	if (ac == 6)
 		sim->meals_goal = ft_atoi(av[5]);
 	else
 		sim->meals_goal = -1;
-	
 	return (SUCCESS);
 }
 
@@ -52,15 +49,11 @@ int	run_simulation(t_simulation *sim)
 {
 	if (set_start_time(sim) != SUCCESS)
 		return (error_exit(ERR_TIME, sim));
-	
 	if (create_philosopher_threads(sim) != SUCCESS)
 		return (error_exit(ERR_THREAD, sim));
-	
 	monitor_simulation(sim);
-	
 	if (join_philosopher_threads(sim) != SUCCESS)
 		return (error_exit(ERR_THREAD, sim));
-	
 	return (SUCCESS);
 }
 
@@ -70,18 +63,13 @@ int	main(int ac, char **av)
 
 	if (validate_arguments(ac, av) != SUCCESS)
 		return (error_exit(ERR_ARGS, NULL));
-	
 	memset(&sim, 0, sizeof(t_simulation));
-	
 	if (parse_arguments(&sim, ac, av) != SUCCESS)
 		return (error_exit(ERR_ARGS, NULL));
-	
 	if (init_simulation(&sim) != SUCCESS)
 		return (ERROR);
-	
 	if (run_simulation(&sim) != SUCCESS)
 		return (ERROR);
-	
 	cleanup_simulation(&sim);
 	return (SUCCESS);
 }

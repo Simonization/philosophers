@@ -15,7 +15,6 @@
 int	init_simulation(t_simulation *sim)
 {
 	sim->simulation_ended = false;
-	
 	if (init_mutexes(sim) != SUCCESS)
 		return (ERROR);
 	if (init_philosophers(sim) != SUCCESS)
@@ -65,9 +64,7 @@ int	init_philosophers(t_simulation *sim)
 			sim->philos[i].left_fork = &sim->forks[sim->nb_philos - 1];
 		else
 			sim->philos[i].left_fork = &sim->forks[i - 1];
-		
 		i++;
 	}
-	
 	return (SUCCESS);
 }

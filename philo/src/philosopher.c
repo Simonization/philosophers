@@ -6,7 +6,7 @@
 /*   By: slangero <slangero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 20:39:52 by student           #+#    #+#             */
-/*   Updated: 2024/03/10 10:00:00 by student          ###   ########.fr       */
+/*   Updated: 2025/03/17 21:33:46 by slangero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	create_philosopher_threads(t_simulation *sim)
 	while (i < sim->nb_philos)
 	{
 		sim->philos[i].last_meal_time = sim->start_time;
-		ret = pthread_create(&sim->philos[i].thread, NULL, 
+		ret = pthread_create(&sim->philos[i].thread, NULL,
 				philosopher_routine, &sim->philos[i]);
 		if (ret != 0)
 			return (ERROR);
@@ -52,7 +52,7 @@ void	*philosopher_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2 == 0)
-		precise_sleep(1, philo->sim);
+		precise_sleep(10, philo->sim);
 	pthread_mutex_lock(&philo->sim->meal_mutex);
 	philo->last_meal_time = get_current_time();
 	pthread_mutex_unlock(&philo->sim->meal_mutex);
@@ -62,7 +62,7 @@ void	*philosopher_routine(void *arg)
 		{
 			log_action(philo, "has taken a fork");
 			precise_sleep(philo->sim->time_to_die, philo->sim);
-			break;
+			break ;
 		}
 		take_forks(philo);
 		eat(philo);

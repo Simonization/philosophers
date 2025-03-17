@@ -46,7 +46,7 @@ bool	check_philosopher_death(t_simulation *sim)
 			sim->simulation_ended = true;
 			pthread_mutex_unlock(&sim->end_mutex);
 			pthread_mutex_lock(&sim->print_mutex);
-			printf("%lld %d died\n", 
+			printf("%lld %d died\n",
 				current_time - sim->start_time, sim->philos[i].id + 1);
 			pthread_mutex_unlock(&sim->print_mutex);
 			return (true);
@@ -80,7 +80,7 @@ void	log_action(t_philo *philo, char *action)
 	long long	timestamp;
 
 	if (simulation_ended(philo->sim))
-		return;
+		return ;
 	timestamp = get_current_time() - philo->sim->start_time;
 	pthread_mutex_lock(&philo->sim->print_mutex);
 	if (!simulation_ended(philo->sim))
