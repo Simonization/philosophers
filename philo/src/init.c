@@ -6,7 +6,7 @@
 /*   By: slangero <slangero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 18:30:29 by student           #+#    #+#             */
-/*   Updated: 2024/03/10 10:00:00 by student          ###   ########.fr       */
+/*   Updated: 2025/03/17 23:01:42 by slangero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,13 @@ int	init_mutexes(t_simulation *sim)
 	}
 	if (pthread_mutex_init(&sim->print_mutex, NULL) != 0)
 		return (error_exit(ERR_MUTEX, sim));
+	sim->print_mutex_initialized = true;
 	if (pthread_mutex_init(&sim->end_mutex, NULL) != 0)
 		return (error_exit(ERR_MUTEX, sim));
+	sim->end_mutex_initialized = true;
 	if (pthread_mutex_init(&sim->meal_mutex, NULL) != 0)
 		return (error_exit(ERR_MUTEX, sim));
+	sim->meal_mutex_initialized = true;
 	return (SUCCESS);
 }
 

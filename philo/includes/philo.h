@@ -6,7 +6,7 @@
 /*   By: slangero <slangero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 10:04:04 by student           #+#    #+#             */
-/*   Updated: 2024/03/10 10:00:00 by student          ###   ########.fr       */
+/*   Updated: 2025/03/17 23:02:50 by slangero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,9 @@ typedef struct s_simulation
 	pthread_mutex_t	end_mutex;
 	pthread_mutex_t	meal_mutex;
 	t_philo			*philos;
+	bool			print_mutex_initialized;
+	bool			end_mutex_initialized;
+	bool			meal_mutex_initialized;
 }	t_simulation;
 
 /* Philosopher structure */

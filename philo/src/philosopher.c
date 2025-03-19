@@ -6,7 +6,7 @@
 /*   By: slangero <slangero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 20:39:52 by student           #+#    #+#             */
-/*   Updated: 2025/03/17 21:33:46 by slangero         ###   ########.fr       */
+/*   Updated: 2025/03/17 21:40:40 by slangero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,10 @@ void	*philosopher_routine(void *arg)
 	{
 		if (philo->sim->nb_philos == 1)
 		{
+			pthread_mutex_lock(philo->right_fork);
 			log_action(philo, "has taken a fork");
 			precise_sleep(philo->sim->time_to_die, philo->sim);
+			pthread_mutex_unlock(philo->right_fork);
 			break ;
 		}
 		take_forks(philo);

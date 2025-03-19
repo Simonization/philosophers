@@ -6,7 +6,7 @@
 /*   By: slangero <slangero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/10 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/03/10 10:00:00 by student          ###   ########.fr       */
+/*   Updated: 2025/03/17 23:01:02 by slangero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,12 @@ void	cleanup_simulation(t_simulation *sim)
 		}
 		free(sim->forks);
 	}
-	pthread_mutex_destroy(&sim->print_mutex);
-	pthread_mutex_destroy(&sim->end_mutex);
-	pthread_mutex_destroy(&sim->meal_mutex);
+	if (sim->print_mutex_initialized)
+		pthread_mutex_destroy(&sim->print_mutex);
+	if (sim->end_mutex_initialized)
+		pthread_mutex_destroy(&sim->end_mutex);
+	if (sim->meal_mutex_initialized)
+		pthread_mutex_destroy(&sim->meal_mutex);
 	if (sim->philos)
 		free(sim->philos);
 }
