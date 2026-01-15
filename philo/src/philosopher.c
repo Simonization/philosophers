@@ -52,7 +52,7 @@ void	*philosopher_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->id % 2 == 0)
-		precise_sleep(10, philo->sim);
+		precise_sleep(philo->sim->time_to_eat / 2, philo->sim);
 	pthread_mutex_lock(&philo->sim->meal_mutex);
 	philo->last_meal_time = get_current_time();
 	pthread_mutex_unlock(&philo->sim->meal_mutex);

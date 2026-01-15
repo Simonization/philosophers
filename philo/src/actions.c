@@ -14,29 +14,29 @@
 
 void	take_forks(t_philo *philo)
 {
-	if (philo->left_fork < philo->right_fork)
+	if (philo->id % 2 == 0)
 	{
-		pthread_mutex_lock(philo->left_fork);
-		log_action(philo, "has taken a fork");
 		pthread_mutex_lock(philo->right_fork);
+		log_action(philo, "has taken a fork");
+		pthread_mutex_lock(philo->left_fork);
 		log_action(philo, "has taken a fork");
 	}
 	else
 	{
-		pthread_mutex_lock(philo->right_fork);
-		log_action(philo, "has taken a fork");
 		pthread_mutex_lock(philo->left_fork);
+		log_action(philo, "has taken a fork");
+		pthread_mutex_lock(philo->right_fork);
 		log_action(philo, "has taken a fork");
 	}
 }
 
 void	eat(t_philo *philo)
 {
-	log_action(philo, "is eating");
 	pthread_mutex_lock(&philo->sim->meal_mutex);
 	philo->last_meal_time = get_current_time();
 	philo->meals_eaten++;
 	pthread_mutex_unlock(&philo->sim->meal_mutex);
+	log_action(philo, "is eating");
 	precise_sleep(philo->sim->time_to_eat, philo->sim);
 }
 
@@ -48,7 +48,17 @@ void	release_forks(t_philo *philo)
 
 void	sleep_and_think(t_philo *philo)
 {
+	int	think_time;
+
 	log_action(philo, "is sleeping");
 	precise_sleep(philo->sim->time_to_sleep, philo->sim);
 	log_action(philo, "is thinking");
+	if (philo->sim->nb_philos % 2 == 1)
+	{
+		think_time = (philo->sim->time_to_eat * 2 - philo->sim->time_to_sleep)
+			/ philo->sim->nb_philos;
+		if (think_time < 0)
+			think_time = 0;
+		precise_sleep(think_time * (philo->id % 2), philo->sim);
+	}
 }
