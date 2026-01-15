@@ -219,14 +219,108 @@ None
 
 1. **Flaky test "5 800 200 200"**
    - **Location:** Scheduling logic
-   - **Description:** Philosopher 2 occasionally starves in tight timing scenarios
+   - **Description:** Philosopher 2 (output) = Philo 1 (code) occasionally starves
    - **Frequency:** ~40% of runs
-   - **Possible cause:** Initial 10ms stagger may not be sufficient for 5 philosophers
+   - **Root cause:** See detailed analysis below
 
 2. **Meal goal test inconsistency**
    - **Test:** `./philo 5 800 200 200 7`
    - **Expected:** All philosophers eat 7 times, then simulation stops
-   - **Actual:** Sometimes philosophers die before reaching goal
+   - **Actual:** Philosophers die before reaching goal (same root cause)
+
+---
+
+## 9. Root Cause Analysis (Deep Dive)
+
+### 9.1 The Problem
+
+With `./philo 5 800 200 200`, Philosopher 2 (output ID, = Philo 1 in code) dies at ~802ms.
+
+**Traced timeline for Philo 1:**
+```
+t=1ms:   EATING (meal 1, last_meal_time = 1ms)
+t=201ms: sleeping
+t=401ms: thinking → tries fork 0 → BLOCKED (Philo 0 has it)
+t=602ms: gets fork 0 → tries fork 1 → BLOCKED (Philo 2 has it)
+t=802ms: DEAD (801ms since last meal > 800ms time_to_die)
+```
+
+### 9.2 Fork Assignment Analysis
+
+```
+Fork assignment for 5 philosophers:
+  Philo 0: right=forks[0], left=forks[4]
+  Philo 1: right=forks[1], left=forks[0]
+  Philo 2: right=forks[2], left=forks[1]
+  Philo 3: right=forks[3], left=forks[2]
+  Philo 4: right=forks[4], left=forks[3]
+
+Address-based ordering (actions.c:17):
+  Since forks[0] < forks[1] < forks[2] < forks[3] < forks[4]:
+
+  Philo 0: left(4) > right(0) → picks RIGHT(0) first
+  Philo 1: left(0) < right(1) → picks LEFT(0) first
+
+  ⚠️  BOTH Philo 0 and Philo 1 compete for FORK 0 FIRST!
+```
+
+### 9.3 The Race Condition
+
+At t=400ms, both Philo 0 and Philo 1 wake from sleep simultaneously:
+
+```
+Philo 0: releases forks → sleeps 200ms → wakes at t=400ms → grabs forks
+Philo 1: releases forks → sleeps 200ms → wakes at t=400ms → logs "thinking" → grabs forks
+```
+
+Due to the overhead of `log_action("thinking")`, **Philo 0 wins the race** for fork 0.
+
+### 9.4 Why the 10ms Stagger Fails
+
+The 10ms initial delay (`philosopher.c:55`) only staggers the **first cycle**:
+
+| Cycle | t=0ms | t=400ms | t=800ms |
+|-------|-------|---------|---------|
+| Stagger | 10ms delay for even | None (both wake together) | None |
+
+After the first cycle, odd and even philosophers wake from sleep **simultaneously**, eliminating the stagger effect.
+
+### 9.5 The Starvation Pattern
+
+```
+t=0ms:    Philo 1 eats (odd, no delay)
+t=200ms:  Philo 0 eats (was waiting)
+t=400ms:  Philo 0 wins race for fork 0, eats again
+          Philo 1 blocked on fork 0
+t=600ms:  Philo 2 has fork 1
+          Philo 1 blocked on fork 1 (already has fork 0)
+t=800ms:  Philo 1 waited 2 full cycles = 800ms → DEAD
+```
+
+### 9.6 Fix Options
+
+| Option | Implementation | Pros | Cons |
+|--------|----------------|------|------|
+| **Longer initial stagger** | `precise_sleep(time_to_eat/2, ...)` | Simple | Only helps first cycle |
+| **Odd/even fork ordering** | Even: right first, Odd: left first | Deterministic | One philo eats 2x more |
+| **Think time stagger** | Add delay in `sleep_and_think()` | Helps every cycle | Adds latency |
+| **Semaphore-based** | Limit concurrent eaters | Fair | More complex |
+
+### 9.7 Recommended Fix
+
+Replace address-based ordering with ID-based ordering:
+
+```c
+// Current (actions.c:17):
+if (philo->left_fork < philo->right_fork)
+
+// Recommended:
+if (philo->id % 2 == 0)  // Even: right first, Odd: left first
+```
+
+This ensures adjacent philosophers always fight for the **same** fork first, guaranteeing at least one can always eat.
+
+---
 
 ### 8.3 Minor Issues
 
