@@ -1,0 +1,13 @@
+# Build artifacts
+philo/philo
+philo/objs/
+*.o
+
+# Editor files
+*.swp
+*~
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
